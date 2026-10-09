@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zameen Katha Dhur Calculator (Bihar)</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background-color: #f4f7f6;
+            text-align: center;
+        }
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            max-width: 400px;
+            margin: auto;
+            text-align: left;
+        }
+        h2 {
+            text-align: center;
+            color: #2c3e50;
+            margin-top: 0;
+        }
+        label {
+            font-weight: bold;
+            display: block;
+            margin-top: 10px;
+        }
+        input, select {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+        button {
+            width: 100%;
+            background-color: #27ae60;
+            color: white;
+            border: none;
+            padding: 12px;
+            margin-top: 15px;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        button:hover {
+            background-color: #219653;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            background: #e8f8f5;
+            border-radius: 5px;
+            border-left: 5px solid #27ae60;
+            display: none;
+        }
+        .result h3 {
+            margin: 0 0 10px 0;
+            color: #117a65;
+        }
+        .result p {
+            margin: 5px 0;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h2>📐 ज़मीन कैलकुलेटर (बिहार)</h2>
+    
+    <label>माप की इकाई (Unit) चुनें:</label>
+    <select id="unit" onchange="clearResult()">
+        <option value="feet">Feet (फीट)</option>
+        <option value="kadi">Kadi (कड़ी / Links)</option>
+    </select>
+
+    <label>लंबाई 1 (Length 1):</label>
+    <input type="number" id="l1" placeholder="जैसे: 184" min="0">
+
+    <label>...और लंबाई 2 (Length 2):</label>
+    <input type="number" id="l2" placeholder="जैसे: 208" min="0">
+
+    <label>चौड़ाई 1 (Width 1):</label>
+    <input type="number" id="w1" placeholder="जैसे: 118" min="0">
+
+    <label>...और चौड़ाई 2 (Width 2):</label>
+    <input type="number" id="w2" placeholder="जैसे: 39" min="0">
+
+    <button onclick="calculateArea()">कुल रकबा निकालें</button>
+
+    <div id="resultBox" class="result">
+        <h3>📊 आपका कुल हिसाब:</h3>
+        <p id="resSqFt"></p>
+        <p id="resKatha" style="font-weight: bold; color: #b7950b;"></p>
+        <p id="resDismil"></p>
+    </div>
+</div>
+
+<script>
+function clearResult() {
+    document.getElementById('resultBox').style.display = 'none';
+}
+
+function calculateArea() {
+    let l1 = parseFloat(document.getElementById('l1').value) || 0;
+    let l2 = parseFloat(document.getElementById('l2').value) || 0;
+    let w1 = parseFloat(document.getElementById('w1').value) || 0;
+    let w2 = parseFloat(document.getElementById('w2').value) || 0;
+    let unit = document.getElementById('unit').value;
+
+    if (l1 <= 0 || l2 <= 0 || w1 <= 0 || w2 <= 0) {
+        alert("कृपया चारों दिशाओं की सही नाप भरें");
+        return;
+    }
+
+    // औसत लंबाई और चौड़ाई (Average Method)
+    let avgL = (l1 + l2) / 2;
+    let avgW = (w1 + w2) / 2;
+    let finalSqFt = 0;
+
+    if (unit === 'feet') {
+        finalSqFt = avgL * avgW;
+    } else {
+        let sqKadi = avgL * avgW;
+        finalSqFt = sqKadi * 0.4356; // 1 वर्ग कड़ी = 0.4356 Sq Ft
+    }
+
+    // बिहार का मानक: 1 धुर = 68.0625 Sq Ft, 1 कट्ठा = 1361.25 Sq Ft
+    let totalDhur = finalSqFt / 68.0625; 
+    let kathaWhole = Math.floor(totalDhur / 20);
+    
+    // धुर की सटीक गणना (दशमलव के 2 स्थानों तक शुद्धता के लिए)
+    let dhurWhole = parseFloat((totalDhur % 20).toFixed(2)); 
+
+    // यदि राउंडिंग या दशमलव की वजह से धुर मान 20 या उसके बेहद करीब पहुंच जाए
+    if (dhurWhole >= 19.99) {
+        kathaWhole += 1;
+        dhurWhole = 0;
+    }
+
+    // 1 डिसमिल = 435.6 Sq Ft
+    let dismilVal = (finalSqFt / 435.6).toFixed(2);
+
+    // आउटपुट दिखाना
+    document.getElementById('resSqFt').innerHTML = "<b>कुल एरिया:</b> " + finalSqFt.toFixed(2) + " Square Feet";
+    document.getElementById('resKatha').innerHTML = "<b>बिहार नाप:</b> " + kathaWhole + " कट्ठा, " + dhurWhole + " धुर";
+    document.getElementById('resDismil').innerHTML = "<b>डिसमिल:</b> " + dismilVal + " Dismil";
+    document.getElementById('resultBox').style.display = 'block';
+}
+</script>
+
+</body>
+</html>
